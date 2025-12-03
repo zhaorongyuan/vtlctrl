@@ -1,21 +1,30 @@
-cmake_minimum_required(VERSION 3.12)
+# 定义 ImGui 源文件目录变量，方便后续引用
+set(IMGUI_DIR "${CMAKE_CURRENT_SOURCE_DIR}/imgui")
 
-# 项目名称和版本
-project(MyTools VERSION 1.0.0 LANGUAGES CXX)
+# 列出所有需要编译的 ImGui 源文件
+# 包括核心文件和 Win32/DX11 的后端实现
+set(IMGUI_SOURCES
+    ${IMGUI_DIR}/imgui.cpp
+    ${IMGUI_DIR}/imgui_demo.cpp
+    ${IMGUI_DIR}/imgui_draw.cpp
+    ${IMGUI_DIR}/imgui_tables.cpp
+    ${IMGUI_DIR}/imgui_widgets.cpp
+    ${IMGUI_DIR}/backends/imgui_impl_win32.cpp
+    ${IMGUI_DIR}/backends/imgui_impl_dx11.cpp
+)
 
-# 设置 C++ 标准 (推荐 C++17 或更高)
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
+# 创建静态库目标
+add_library(imgui_lib STATIC ${IMGUI_SOURCES})
 
-# 开启文件夹支持 (在 VS 中可以看到逻辑文件夹结构)
-set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+# 设置头文件包含路径
+# PUBLIC 关键字意味着链接这个库的目标 (如 main) 也能自动找到这些头文件
+target_include_directories(imgui_lib PUBLIC
+    ${IMGUI_DIR}
+    ${IMGUI_DIR}/backends
+)
 
-# 输出目录设置 (把 exe 和 dll 都在 bin 目录下生成)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
-
-# --- 核心结构 ---
-# 1. 先添加第三方库 (ImGui)
-add_subdirectory(vendor)
-
-# 2. 再添加主程序
-add_subdirectory(src)
+# Windows 平台特定设置
+if(WIN32)
+    # 消除一些不必需的 MSVC 警告
+    target_compile_definitions(imgui_lib PUBLIC _CRT_SECURE_NO_WARNINGS)
+endif()

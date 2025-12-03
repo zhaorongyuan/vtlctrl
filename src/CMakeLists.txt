@@ -1,18 +1,19 @@
-# 收集所有源码文件
-# GLOB_RECURSE 会自动把 gui/ 和 core/ 下的 .cpp/.h 都加进来
-# 注意：在生产环境中通常建议手动列出文件，但个人项目用 GLOB 很方便
-file(GLOB_RECURSE APP_SOURCES 
-    "*.cpp" 
-    "*.h"
-)
+# 添加可执行文件
+add_executable(vtlctrl main.cpp)
 
-# --- 创建可执行文件 ---
-# WIN32 选项：表示这是一个 GUI 程序，不会弹出黑色控制台
-add_executable(MyApp WIN32 ${APP_SOURCES})
+# 链接第三方库 (ImGui)
+target_link_libraries(vtlctrl PRIVATE imgui_lib)
 
-# --- 链接 ImGui ---
-# 只需要这一行！头文件路径、DirectX 库都会自动引入
-target_link_libraries(MyApp PRIVATE imgui_static)
+# 链接 Windows 系统库
+# ImGui DX11 后端依赖 d3d11 和 d3dcompiler
+# dwmapi 通常用于窗口边框处理等
+if(WIN32)
+    target_link_libraries(vtlctrl PRIVATE
+        d3d11
+        d3dcompiler
+        dwmapi
+    )
+endif()
 
-# 设置 IDE 中的文件夹结构
-source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${APP_SOURCES})
+# 如果你想让控制台窗口消失（发布为 GUI 程序），取消下面这行的注释：
+# set_target_properties(vtlctrl PROPERTIES LINK_FLAGS "/SUBSYSTEM:WINDOWS /ENTRY:mainCRTStartup")

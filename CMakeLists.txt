@@ -7,15 +7,10 @@ project(vtlctrl VERSION 1.0 LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# 开启文件夹支持 (在 VS 中可以看到逻辑文件夹结构)
-set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+# 开启 Unicode 支持 (Windows 应用程序通常需要)
+add_definitions(-DUNICODE -D_UNICODE)
 
-# 输出目录设置 (把 exe 和 dll 都在 bin 目录下生成)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
-
-# --- 核心结构 ---
-# 1. 先添加第三方库 (ImGui)
-add_subdirectory(vendor)
-
-# 2. 再添加主程序
+# 添加子目录
+add_subdirectory(thirdparty)
 add_subdirectory(src)
+#add_subdirectory(config)
